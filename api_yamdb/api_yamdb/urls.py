@@ -25,4 +25,4 @@ urlpatterns = [
         name='redoc'
     ),
 ]
-# test another
+print('check')
