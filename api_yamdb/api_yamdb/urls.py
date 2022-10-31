@@ -25,4 +25,3 @@ urlpatterns = [
         name='redoc'
     ),
 ]
-print('check')
