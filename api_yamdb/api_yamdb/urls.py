@@ -25,4 +25,3 @@ urlpatterns = [
         name='redoc'
     ),
 ]
-# test merge
