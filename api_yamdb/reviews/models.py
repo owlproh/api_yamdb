@@ -1,7 +1,9 @@
 import textwrap as tw
+from datetime import datetime
 
 from django.contrib.auth import get_user_model
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import (MaxValueValidator, MinValueValidator,
+                                    RegexValidator)
 from django.db import models
 
 User = get_user_model()
@@ -9,17 +11,129 @@ User = get_user_model()
 
 class Genre(models.Model):
     "Модель жанров."
-    pass
+    name = models.CharField(
+        max_length=60,
+        vorbose_name='Название',
+        db_index=True
+    )
+    slug = models.SlugField(
+        max_length=40,
+        verbose_name='slug',
+        unique=True,
+        validators=[RegexValidator(
+            regex=r'^[-a-zA-Z0-9_]+$',
+            message='Вы используете недопустимые символы'
+        )]
+    )
+
+    class Meta:
+        verbose_name = 'Жанр',
+        verbose_name_plural = 'Жанры',
+        ordering = ('name',)
+
+    def __str__(self):
+        return tw.shorten(self.name, width=15, placeholder='...')
 
 
 class Category(models.Model):
     "Модель категорий."
-    pass
+    name = models.CharField(
+        max_length=150,
+        verbose_name='Название категории',
+        db_index=True
+    )
+    slug = models.SlugField(
+        max_length=40,
+        verbose_name='slug',
+        unique=True,
+        validators=[RegexValidator(
+            regex=r'^[-a-zA-Z0-9_]+$',
+            message='Вы используете недопустимые символы'
+        )]
+    )
+
+    class Meta:
+        verbose_name = 'Категория',
+        verbose_name_plural = 'Категории',
+        ordering = ('name',)
+
+    def __str__(self):
+        return tw.shorten(self.name, width=15, placeholder='...')
 
 
 class Title(models.Model):
     "Модель произведений."
-    pass
+    name = models.CharField(
+        max_length=120,
+        verbose_name='Название произведения',
+        db_index=True
+    )
+    year = models.PositiveIntegerField(
+        verbose_name='Год выпуска',
+        validators=[RegexValidator(
+            MinValueValidator(
+                0,
+                message='Год выпуска должен быть нашей эры :)'
+            ),
+            MaxValueValidator(
+                int(datetime.now().year),
+                message='Год выпуска должен быть не больше текущего'
+            )
+        )]
+    )
+    description = models.TextField(
+        verbose_name='Описание произведения',
+        blank=True
+    )
+    genre = models.ManyToManyField(
+        Genre,
+        through='GenreTitle',
+        related_name='titles',
+        verbose_name='Жанр произведения'
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        related_name='titles',
+        verbose_name='Категория произведения',
+        null=True
+    )
+
+    class Meta:
+        verbose_name = 'Произведение',
+        verbose_name_plural = 'Произведения',
+        ordering = ('-year', 'name')
+        constraints = (
+            models.UniqueConstraint(
+                fields=['year', 'name'],
+                name='unique_year_title'
+            ),
+        )
+
+    def __str__(self):
+        return tw.shorten(self.name, width=15, placeholder='...')
+
+
+class GenreTitle(models.Model):
+    "Модель связи жанра и произведения."
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.CASCADE,
+        verbose_name='Жанр'
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        verbose_name='Произведение'
+    )
+
+    class Meta:
+        verbose_name = 'Связь жанра и произведения',
+        vebose_name_plural = 'Связи жанров и произведений',
+        ordering = ('id',)
+    
+    def __str__(self):
+        return f'Произведению {self.title} соответствует жанр {self.genre}'
 
 
 class Review(models.Model):
