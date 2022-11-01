@@ -1,10 +1,29 @@
 import textwrap as tw
 
+from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
+User = get_user_model()
+
+
+class Genre(models.Model):
+    "Модель жанров."
+    pass
+
+
+class Category(models.Model):
+    "Модель категорий."
+    pass
+
+
+class Title(models.Model):
+    "Модель произведений."
+    pass
+
 
 class Review(models.Model):
+    "Модель отзывов."
     title = models.ForeignKey(
         'Titles',
         on_delete=models.CASCADE,
@@ -49,6 +68,7 @@ class Review(models.Model):
 
 
 class Comment(models.Model):
+    "Модель комментариев."
     title = models.ForeignKey(
         'Titles',
         on_delete=models.CASCADE,
