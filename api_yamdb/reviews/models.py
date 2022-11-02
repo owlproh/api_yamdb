@@ -13,7 +13,7 @@ class Genre(models.Model):
     "Модель жанров."
     name = models.CharField(
         max_length=60,
-        vorbose_name='Название',
+        verbose_name='Название',
         db_index=True
     )
     slug = models.SlugField(
@@ -27,8 +27,8 @@ class Genre(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Жанр',
-        verbose_name_plural = 'Жанры',
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
         ordering = ('name',)
 
     def __str__(self):
@@ -53,8 +53,8 @@ class Category(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Категория',
-        verbose_name_plural = 'Категории',
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
         ordering = ('name',)
 
     def __str__(self):
@@ -100,8 +100,8 @@ class Title(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Произведение',
-        verbose_name_plural = 'Произведения',
+        verbose_name = 'Произведение'
+        verbose_name_plural = 'Произведения'
         ordering = ('-year', 'name')
         constraints = (
             models.UniqueConstraint(
@@ -128,8 +128,8 @@ class GenreTitle(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Связь жанра и произведения',
-        vebose_name_plural = 'Связи жанров и произведений',
+        verbose_name = 'Связь жанра и произведения'
+        verbose_name_plural = 'Связи жанров и произведений'
         ordering = ('id',)
     
     def __str__(self):
