@@ -12,12 +12,12 @@ User = get_user_model()
 class Genre(models.Model):
     "Модель жанров."
     name = models.CharField(
-        max_length=60,
+        max_length=256,
         verbose_name='Название',
         db_index=True
     )
     slug = models.SlugField(
-        max_length=40,
+        max_length=50,
         verbose_name='slug',
         unique=True,
         validators=[RegexValidator(
