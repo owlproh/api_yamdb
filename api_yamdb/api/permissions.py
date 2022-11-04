@@ -3,7 +3,9 @@ from rest_framework import permissions
 
 class IsOnlyAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.role == 'admin'
+        return (
+            request.user.role == 'admin' or request.user.is_superuser
+        ) and request.user.is_authenticated
 
 
 class IsAdminModerAuthor(permissions.BasePermission):

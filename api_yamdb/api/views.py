@@ -119,9 +119,12 @@ class TokenAPIView(APIView):
 
 
 class UsersViewSet(viewsets.ModelViewSet):
+    """ViewSet для объектов модели User."""
     queryset = User.object.all()
     serializer_class = UsersSerializer
     permission_classes = (IsOnlyAdmin,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',)
 
 
 class UserMeView(mixins.RetrieveModelMixin,
