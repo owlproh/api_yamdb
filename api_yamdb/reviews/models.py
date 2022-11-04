@@ -12,11 +12,7 @@ User = get_user_model()
 class Genre(models.Model):
     "Модель жанров."
     name = models.CharField(
-<<<<<<< HEAD
         max_length=256,
-=======
-        max_length=60,
->>>>>>> users_manipulation
         verbose_name='Название',
         db_index=True
     )
