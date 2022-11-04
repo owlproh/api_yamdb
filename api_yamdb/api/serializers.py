@@ -1,6 +1,6 @@
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
-
-from reviews.models import Comment, Review, Genre, Category, Title
+from reviews.models import Category, Comment, Genre, Review, Title
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -93,9 +93,11 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
 
     def validate(self, data):
-        if self.context['request'].method == 'POST':
-            user = self.context['request'].user
-            title_id = self.context['view'].kwargs.get('title_id')
-            if Review.objects.filter(author=user, title_id=title_id).exists():
+        """Не даёт плодить комментарии."""
+        if self.context('request').method == 'POST':
+            user = self.context('request').user
+            title_id = self.context('view').kwargs.get('title_id')
+            title = get_object_or_404(Title, pk=title_id)
+            if Review.objects.filter(author=user, title=title).exists():
                 raise serializers.ValidationError('Вы уже оставили отзыв.')
         return data
