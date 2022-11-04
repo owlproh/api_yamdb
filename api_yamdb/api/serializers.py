@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title
+from users.models import User
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -45,6 +46,47 @@ class TitleSerializer(serializers.ModelSerializer):
             'description',
             'genre',
             'category'
+        )
+
+
+class SignUpSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
+
+    class Meta:
+        fields = ('username', 'email')
+
+    def validate(self, data):
+        if data['username'] == 'me':
+            raise serializers.ValidationError('Недопустимый логин!')
+        return data
+
+
+class TokenSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(required=True)
+
+    class Meta:
+        fields = ('username', 'confirmation_code')
+
+
+class UsersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio',
+        )
+
+
+class UserMeSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio',
         )
 
 
