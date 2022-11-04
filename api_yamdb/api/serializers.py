@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title
 
+<<<<<<< HEAD
 
 class GenreSerializer(serializers.ModelSerializer):
     """Сериализатор для модели Genre."""
@@ -46,6 +47,9 @@ class TitleSerializer(serializers.ModelSerializer):
             'genre',
             'category'
         )
+=======
+from reviews.models import Comment, Review
+>>>>>>> users_manipulation
 
 
 class CommentSerializer(serializers.ModelSerializer):
