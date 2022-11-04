@@ -25,6 +25,26 @@ class TokenSerializer(serializers.Serializer):
         fields = ('username', 'confirmation_code')
 
 
+class UsersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio',
+        )
+
+
+class UserMeSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio',
+        )
+
+
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(
         slug_field='username',
