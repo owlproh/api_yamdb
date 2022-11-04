@@ -1,6 +1,28 @@
 from rest_framework import serializers
 
 from reviews.models import Comment, Review
+from users.models import User
+
+
+class SignUpSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    username = serializers.CharField(required=True)
+
+    class Meta:
+        fields = ('username', 'email')
+
+    def validate(self, data):
+        if data['username'] == 'me':
+            raise serializers.ValidationError('Недопустимый логин!')
+        return data
+
+
+class TokenSerializer(serializers.Serializer):
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(required=True)
+
+    class Meta:
+        fields = ('username', 'confirmation_code')
 
 
 class CommentSerializer(serializers.ModelSerializer):
