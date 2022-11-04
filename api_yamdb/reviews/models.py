@@ -12,12 +12,12 @@ User = get_user_model()
 class Genre(models.Model):
     "Модель жанров."
     name = models.CharField(
-        max_length=60,
+        max_length=256,
         verbose_name='Название',
         db_index=True
     )
     slug = models.SlugField(
-        max_length=40,
+        max_length=50,
         verbose_name='slug',
         unique=True,
         validators=[RegexValidator(
@@ -139,7 +139,7 @@ class GenreTitle(models.Model):
 class Review(models.Model):
     "Модель отзывов."
     title = models.ForeignKey(
-        'Titles',
+        Title,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Произведение',
@@ -151,7 +151,7 @@ class Review(models.Model):
         verbose_name='Отзыв'
     )
     author = models.ForeignKey(
-        'CustomUser',
+        User,
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Автор отзыва',
@@ -184,7 +184,7 @@ class Review(models.Model):
 class Comment(models.Model):
     "Модель комментариев."
     title = models.ForeignKey(
-        'Titles',
+        Title,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Произведение',
@@ -203,7 +203,7 @@ class Comment(models.Model):
         null=False
     )
     author = models.ForeignKey(
-        'CustomUser',
+        User,
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Автор комментария',
