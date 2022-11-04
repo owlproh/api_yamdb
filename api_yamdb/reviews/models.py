@@ -64,7 +64,7 @@ class Category(models.Model):
 class Title(models.Model):
     "Модель произведений."
     name = models.CharField(
-        max_length=120,
+        max_length=150,
         verbose_name='Название произведения',
         db_index=True
     )
