@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import Category, Comment, Genre, GenreTitle, Review, Title
+from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
+from users.models import User
 
 per_page: int = 10
 
@@ -78,3 +79,17 @@ class ReviewAdmin(admin.ModelAdmin):
     list_per_page = per_page
     empty_value_display = '-пусто-'
     inlines = [CommentInLine]
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    list_display = (
+        'username',
+        'email',
+        'first_name',
+        'last_name',
+        'role'
+    )
+    list_per_page = per_page
+    list_filter = ('username', 'first_name', 'last_name', 'role')
+    search_fields = ('username', 'role')

@@ -12,7 +12,7 @@ User = get_user_model()
 class Genre(models.Model):
     "Модель жанров."
     name = models.CharField(
-        max_length=60,
+        max_length=250,
         verbose_name='Название',
         db_index=True
     )
@@ -38,12 +38,12 @@ class Genre(models.Model):
 class Category(models.Model):
     "Модель категорий."
     name = models.CharField(
-        max_length=150,
+        max_length=250,
         verbose_name='Название категории',
         db_index=True
     )
     slug = models.SlugField(
-        max_length=40,
+        max_length=50,
         verbose_name='slug',
         unique=True,
         validators=[RegexValidator(
@@ -64,13 +64,13 @@ class Category(models.Model):
 class Title(models.Model):
     "Модель произведений."
     name = models.CharField(
-        max_length=120,
+        max_length=200,
         verbose_name='Название произведения',
         db_index=True
     )
     year = models.PositiveIntegerField(
         verbose_name='Год выпуска',
-        validators=[RegexValidator(
+        validators=[
             MinValueValidator(
                 0,
                 message='Год выпуска должен быть нашей эры :)'
@@ -79,7 +79,7 @@ class Title(models.Model):
                 int(datetime.now().year),
                 message='Год выпуска должен быть не больше текущего'
             )
-        )]
+        ]
     )
     description = models.TextField(
         verbose_name='Описание произведения',
@@ -198,7 +198,7 @@ class Comment(models.Model):
         null=False
     )
     text = models.TextField(
-        max_length=300,
+        max_length=200,
         verbose_name='Комментарий',
         null=False
     )
