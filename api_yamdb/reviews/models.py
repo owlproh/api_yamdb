@@ -12,7 +12,7 @@ User = get_user_model()
 class Genre(models.Model):
     "Модель жанров."
     name = models.CharField(
-        max_length=256,
+        max_length=60,
         verbose_name='Название',
         db_index=True
     )
@@ -131,7 +131,7 @@ class GenreTitle(models.Model):
         verbose_name = 'Связь жанра и произведения'
         verbose_name_plural = 'Связи жанров и произведений'
         ordering = ('id',)
-    
+
     def __str__(self):
         return f'Произведению {self.title} соответствует жанр {self.genre}'
 
