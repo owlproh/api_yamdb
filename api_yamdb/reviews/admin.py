@@ -4,6 +4,7 @@ from .models import Category, Comment, Genre, GenreTitle, Review, Title
 
 per_page: int = 10
 
+
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = (
