@@ -38,7 +38,6 @@ class TitleAdmin(admin.ModelAdmin):
         'name',
         'year',
         'description',
-        'genre',
         'category'
     )
     list_per_page = per_page

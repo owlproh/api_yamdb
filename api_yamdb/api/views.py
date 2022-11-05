@@ -20,7 +20,7 @@ from .serializers import (SignUpSerializer, TokenSerializer, UsersSerializer,
 class SignUpAPIView(APIView):
     def post(self, request):
         serializer = SignUpSerializer(data=request.data)
-        serializer.is_valid()
+        serializer.is_valid(raise_exception=True)
         email = serializer.validated_data['email']
         username = serializer.validated_data['username']
         try:
@@ -78,20 +78,24 @@ class UserMeView(mixins.RetrieveModelMixin,
 
 class CategoryViewSet(mixins.CreateModelMixin,
                       mixins.ListModelMixin,
+                      mixins.DestroyModelMixin,
                       viewsets.GenericViewSet):
     """Viewset для объектов модели Category."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = (IsOnlyAdmin,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
 
 class GenreViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
+                   mixins.DestroyModelMixin,
                    viewsets.GenericViewSet):
     """Viewset для объектов модели Genre."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (IsOnlyAdmin,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
@@ -106,6 +110,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     """ViewSet для лбъектов модели Comment."""
     serializer_class = CommentSerializer
+    permission_classes = (IsAdminModerAuthor,)
     # permission_classes = pass
 
     def get_review(self):
@@ -122,6 +127,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     """ViewSet для объектов модели Review."""
     serializer_class = ReviewSerializer
+    permission_classes = (IsAdminModerAuthor,)
     # permission_classes = pass
 
     def get_title(self):
