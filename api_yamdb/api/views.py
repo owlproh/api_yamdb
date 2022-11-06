@@ -2,13 +2,13 @@ from rest_framework.generics import get_object_or_404
 from .serializers import CommentSerializer, ReviewSerializer
 from ..reviews.models import Comment, Review, Title
 from rest_framework import viewsets
+from .permissions import IsAdminModerAuthor
 
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    permission_classes = pass
+    permission_classes = (IsAdminModerAuthor,)
 
-    def get_title
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
         review_id = self.kwargs.get('review_id')
@@ -26,7 +26,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
-    permission_classes = pass
+    permission_classes = (IsAdminModerAuthor,)
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
