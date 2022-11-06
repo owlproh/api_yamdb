@@ -67,22 +67,17 @@ class TokenAPIView(APIView):
 class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UsersSerializer
-    permission_classes = (permissions.IsAuthenticated, IsOnlyAdmin)
+    permission_classes = (permissions.IsAuthenticated, IsOnlyAdmin,)
     filter_backends = (filters.SearchFilter,)
     filterset_fields = ('username',)
     search_fields = ('username',)
     lookup_field = 'username'
 
-    def perform_create(self, serializer):
-        serializer = UsersSerializer(data=self.request.data)
-        serializer.is_valid()
-        serializer.save()
-        return super().perform_create(serializer)
-
     @action(
         methods=['GET', 'PATCH'],
         detail=False,
-        url_path='me'
+        url_path='me',
+        permission_classes=(permissions.IsAuthenticated,)
     )
     def me(self, request):
         user = get_object_or_404(User, username=self.request.user)
