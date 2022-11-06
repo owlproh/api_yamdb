@@ -1,15 +1,18 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+ADMIN = 'admin'
+MODERATOR = 'moderator'
+USER = 'user'
+
 
 class User(AbstractUser):
     roles = (
-        ('admin', 'Администратор'),
-        ('moderator', 'Модератор'),
-        ('user', 'Пользователь'),
+        (ADMIN, 'Администратор'),
+        (MODERATOR, 'Модератор'),
+        (USER, 'Пользователь'),
     )
     username = models.CharField(
-        'Логин',
         max_length=150,
         unique=True
     )
@@ -20,11 +23,13 @@ class User(AbstractUser):
     )
     first_name = models.CharField(
         'Имя',
-        max_length=150
+        max_length=150,
+        blank=True
     )
     last_name = models.CharField(
         'Фамилия',
-        max_length=150
+        max_length=150,
+        blank=True
     )
     bio = models.TextField(
         'Биография',
@@ -32,7 +37,8 @@ class User(AbstractUser):
     )
     role = models.CharField(
         max_length=14,
-        choices=roles
+        choices=roles,
+        default=USER
     )
     confirmation_code = models.CharField(
         'Код подтверждения',
@@ -40,17 +46,20 @@ class User(AbstractUser):
         null=True
     )
 
+    REQUIRED_FIELDS = ['email']
+    USERNAME_FIELD = 'email'
+
     def __str__(self):
         return self.username
-    
+
     @property
     def is_admin(self):
-        return self.role == 'admin'
-    
+        return self.role == 'admin' or self.is_superuser
+
     @property
     def is_moderator(self):
         return self.role == 'moderator'
-    
+
     @property
     def is_user(self):
         return self.role == 'user'

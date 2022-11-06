@@ -1,10 +1,12 @@
 from datetime import datetime
 
+from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title
-from users.models import User
+
+User = get_user_model()
 
 
 class SignUpSerializer(serializers.Serializer):
@@ -36,6 +38,7 @@ class TokenSerializer(serializers.Serializer):
 
 
 class UsersSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = (

@@ -1,5 +1,6 @@
 import uuid
 
+from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
@@ -8,7 +9,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
-from users.models import User
 
 from .filters import TitleFilter
 from .permissions import (IsAdminModerAuthor, IsAdminOrAuthor,
@@ -17,6 +17,8 @@ from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
                           TitleGetSerializer, TitlePostSerializer,
                           TokenSerializer, UserMeSerializer, UsersSerializer)
+
+User = get_user_model()
 
 
 class SignUpAPIView(APIView):
@@ -49,14 +51,14 @@ class SignUpAPIView(APIView):
 class TokenAPIView(APIView):
     def post(self, request):
         serializer = TokenSerializer(data=request.data)
-        serializer.is_valid()
-        username = serializer.validated_data['username']
-        confirmation_code = serializer.validated_data['confirmation_code']
+        serializer.is_valid(raise_exception=True)
+        username = serializer.data['username']
+        confirmation_code = serializer.data['confirmation_code']
         user = get_object_or_404(User, username=username)
         if user.confirmation_code != confirmation_code:
             return Response(serializer.errors,
                             status=status.HTTP_400_BAD_REQUEST)
-        token = AccessToken.for_user(user)
+        token = str(AccessToken.for_user(user))
         content = {'token': token}
         return Response(content, status=status.HTTP_201_CREATED)
 
@@ -67,17 +69,24 @@ class UsersViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated, IsOnlyAdmin,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
+    lookup_field = 'username'
+
+    def perform_create(self, serializer):
+        serializer = UsersSerializer(data=self.request.data)
+        serializer.is_valid()
+        serializer.save()
+        return super().perform_create(serializer)
 
 
 class UserMeView(mixins.RetrieveModelMixin,
                  mixins.UpdateModelMixin,
                  viewsets.GenericViewSet):
     serializer_class = UserMeSerializer
-    permission_classes = (IsAdminOrAuthor,)
+    permission_classes = (permissions.IsAuthenticated,)
+    lookup_field = 'username'
 
     def get_queryset(self):
-        user = get_object_or_404(User, username=self.request.user.username)
-        return user
+        return self.request.user.username
 
 
 class CategoryViewSet(mixins.CreateModelMixin,
