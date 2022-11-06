@@ -20,7 +20,7 @@ v1_router.register(
     basename='comments'
 )
 v1_router.register('users', UsersViewSet, basename='users')
-v1_router.register('users/me', UserMeView, basename='me')
+v1_router.register('users/me', UserMeView, basename='users/me')
 
 
 app_name = 'api'
