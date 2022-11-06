@@ -51,9 +51,9 @@ class SignUpAPIView(APIView):
 class TokenAPIView(APIView):
     def post(self, request):
         serializer = TokenSerializer(data=request.data)
-        serializer.is_valid()
-        username = serializer.validated_data['username']
-        confirmation_code = serializer.validated_data['confirmation_code']
+        serializer.is_valid(raise_exception=True)
+        username = serializer.data['username']
+        confirmation_code = serializer.data['confirmation_code']
         user = get_object_or_404(User, username=username)
         if user.confirmation_code != confirmation_code:
             return Response(serializer.errors,

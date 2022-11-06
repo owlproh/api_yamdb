@@ -22,7 +22,7 @@ class User(AbstractUser):
                                          max_length=255,
                                          null=True)
 
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = ['email']
     USERNAME_FIELD = 'email'
 
     def __str__(self):
