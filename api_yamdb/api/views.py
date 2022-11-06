@@ -6,6 +6,7 @@ from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
@@ -66,8 +67,9 @@ class TokenAPIView(APIView):
 class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UsersSerializer
-    permission_classes = (permissions.IsAuthenticated, IsOnlyAdmin,)
+    permission_classes = (permissions.IsAuthenticated, IsOnlyAdmin)
     filter_backends = (filters.SearchFilter,)
+    filterset_fields = ('username',)
     search_fields = ('username',)
     lookup_field = 'username'
 
@@ -77,16 +79,23 @@ class UsersViewSet(viewsets.ModelViewSet):
         serializer.save()
         return super().perform_create(serializer)
 
-
-class UserMeView(mixins.RetrieveModelMixin,
-                 mixins.UpdateModelMixin,
-                 viewsets.GenericViewSet):
-    serializer_class = UserMeSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-    lookup_field = 'username'
-
-    def get_queryset(self):
-        return self.request.user.username
+    @action(
+        methods=['GET', 'PATCH'],
+        detail=False,
+        url_path='me'
+    )
+    def me(self, request):
+        user = get_object_or_404(User, username=self.request.user)
+        if request.method == 'GET':
+            serializer = UserMeSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        if request.method == 'PATCH':
+            serializer = UserMeSerializer(user,
+                                          data=request.data,
+                                          partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CategoryViewSet(mixins.CreateModelMixin,

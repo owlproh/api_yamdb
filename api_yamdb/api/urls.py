@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from .views import (CategoryViewSet, CommentViewSet, GenreViewSet,
                     ReviewViewSet, TitleViewSet, SignUpAPIView,
-                    TokenAPIView, UsersViewSet, UserMeView)
+                    TokenAPIView, UsersViewSet)
 
 v1_router = routers.DefaultRouter()
 v1_router.register('categories', CategoryViewSet, basename='categories')
@@ -20,7 +20,6 @@ v1_router.register(
     basename='comments'
 )
 v1_router.register('users', UsersViewSet, basename='users')
-v1_router.register('users/me', UserMeView, basename='users/me')
 
 
 app_name = 'api'
