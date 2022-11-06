@@ -12,7 +12,7 @@ User = get_user_model()
 class Genre(models.Model):
     "Модель жанров."
     name = models.CharField(
-        max_length=250,
+        max_length=256,
         verbose_name='Название',
         db_index=True
     )
@@ -38,7 +38,7 @@ class Genre(models.Model):
 class Category(models.Model):
     "Модель категорий."
     name = models.CharField(
-        max_length=250,
+        max_length=256,
         verbose_name='Название категории',
         db_index=True
     )
@@ -64,7 +64,7 @@ class Category(models.Model):
 class Title(models.Model):
     "Модель произведений."
     name = models.CharField(
-        max_length=200,
+        max_length=256,
         verbose_name='Название произведения',
         db_index=True
     )

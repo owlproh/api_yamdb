@@ -3,7 +3,6 @@ import uuid
 from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,12 +10,13 @@ from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 from users.models import User
 
+from .filters import TitleFilter
 from .permissions import (IsAdminModerAuthor, IsAdminOrAuthor,
                           IsAdminUserOrReadOnly, IsOnlyAdmin)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
-                          TitleSerializer, TokenSerializer, UserMeSerializer,
-                          UsersSerializer)
+                          TitleGetSerializer, TitlePostSerializer,
+                          TokenSerializer, UserMeSerializer, UsersSerializer)
 
 
 class SignUpAPIView(APIView):
@@ -64,7 +64,7 @@ class TokenAPIView(APIView):
 class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UsersSerializer
-    permission_classes = (permissions.IsAuthenticated ,IsOnlyAdmin,)
+    permission_classes = (permissions.IsAuthenticated, IsOnlyAdmin,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
 
@@ -107,9 +107,14 @@ class GenreViewSet(mixins.CreateModelMixin,
 class TitleViewSet(viewsets.ModelViewSet):
     """Viewset для объектов модели Title."""
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
-    serializer_class = TitleSerializer
-    filter_backends = (DjangoFilterBackend,)
+    ordering_fields = ('name', 'year')
+    filterset_class = TitleFilter
     permission_classes = (IsAdminUserOrReadOnly,)
+
+    def get_serializer_class(self):
+        if self.action == 'list' or self.action == 'retrieve':
+            return TitleGetSerializer
+        return TitlePostSerializer
 
 
 class CommentViewSet(viewsets.ModelViewSet):

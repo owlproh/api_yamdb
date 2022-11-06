@@ -1,3 +1,6 @@
+from datetime import datetime
+
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from reviews.models import Category, Comment, Genre, Review, Title
@@ -5,14 +8,21 @@ from users.models import User
 
 
 class SignUpSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    username = serializers.CharField(required=True)
+    email = serializers.EmailField(
+        max_length=254,
+        required=True
+    )
+    username = serializers.RegexField(
+        max_length=150,
+        required=True,
+        regex=r'^[\w.@+-]'
+    )
 
     class Meta:
         fields = ('username', 'email')
 
     def validate(self, data):
-        if data['username'] == 'me':
+        if data == 'me':
             raise serializers.ValidationError('Недопустимый логин!')
         return data
 
@@ -67,8 +77,8 @@ class CategorySerializer(serializers.ModelSerializer):
         )
 
 
-class TitleSerializer(serializers.ModelSerializer):
-    """Сериализатор для модели Title."""
+class TitlePostSerializer(serializers.ModelSerializer):
+    """Сериализатор для POST-запросов к модели Title."""
     genre = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Genre.objects.all(),
@@ -77,6 +87,17 @@ class TitleSerializer(serializers.ModelSerializer):
     category = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Category.objects.all()
+    )
+    year = serializers.IntegerField(
+        validators=[
+            MinValueValidator(
+                0,
+                message='Год выпуска должен быть нашей эры :)'
+            ),
+            MaxValueValidator(
+                int(datetime.now().year),
+                message='Год выпуска должен быть не больше текущего'
+            )]
     )
 
     class Meta:
@@ -89,6 +110,34 @@ class TitleSerializer(serializers.ModelSerializer):
             'genre',
             'category'
         )
+
+
+class TitleGetSerializer(serializers.ModelSerializer):
+    """Сериализатор для GET-запросов к модели Title."""
+    genre = GenreSerializer(
+        read_only=True,
+        many=True
+    )
+    category = CategorySerializer(
+        read_only=True
+    )
+    description = serializers.CharField(
+        required=False
+    )
+    rating = serializers.FloatField()
+
+    class Meta:
+        model = Title
+        fields = (
+            'id',
+            'name',
+            'year',
+            'description',
+            'genre',
+            'category',
+            'rating'
+        )
+        read_only_fields = ('__all__',)
 
 
 class CommentSerializer(serializers.ModelSerializer):
