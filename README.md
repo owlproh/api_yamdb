@@ -73,7 +73,8 @@
 #### Полный список запросов API находятся в [документации](#документация)
 
 #### Авторы
-! Надо добавить ссылки на нас!
 [Святослав](https://github.com/owlproh)
+
 [Тимур](https://github.com/TimurMahmudov)
+
 [Мария](https://github.com/maria-kat)
