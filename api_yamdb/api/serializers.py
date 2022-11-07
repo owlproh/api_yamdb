@@ -80,8 +80,13 @@ class CategorySerializer(serializers.ModelSerializer):
         )
 
 
+<<<<<<< HEAD
 class TitlePostSerializer(serializers.ModelSerializer):
     """Сериализатор для POST-запросов к модели Title."""
+=======
+class TitleSerializer(serializers.ModelSerializer):
+    """Сериализатор для модели Title."""
+>>>>>>> parent of ecc2873 (53 passed)
     genre = serializers.SlugRelatedField(
         slug_field='slug',
         queryset=Genre.objects.all(),
@@ -113,6 +118,7 @@ class TitlePostSerializer(serializers.ModelSerializer):
             'genre',
             'category'
         )
+<<<<<<< HEAD
 
 
 class TitleGetSerializer(serializers.ModelSerializer):
@@ -141,6 +147,8 @@ class TitleGetSerializer(serializers.ModelSerializer):
             'rating'
         )
         read_only_fields = ('__all__',)
+=======
+>>>>>>> parent of ecc2873 (53 passed)
 
 
 class CommentSerializer(serializers.ModelSerializer):

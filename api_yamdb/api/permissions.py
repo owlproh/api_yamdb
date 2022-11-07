@@ -18,8 +18,12 @@ class IsAdminModerAuthor(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         return (
+<<<<<<< HEAD
             request.method in permissions.SAFE_METHODS
             or obj.author == request.user
+=======
+            obj.author == request.user
+>>>>>>> parent of ecc2873 (53 passed)
             or request.user.is_moderator
             or request.user.is_admin
         )
