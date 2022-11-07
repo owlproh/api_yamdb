@@ -27,32 +27,37 @@
 - Возможность получения подробной информации о себе и удаления своего аккаунта.
 - Фильтрация по полям.
 
-#### Документация к API доступна по адресу [http://127.0.0.1:8000/redoc/](http://127.0.0.1:8000/redoc/) после запуска сервера с проектом
+#### Документация
+
+После запуска проекта (*см. ниже) по адресу [http://127.0.0.1:8000/redoc/](http://127.0.0.1:8000/redoc/) доступна документация к проекту.
 
 #### Технологии 
 
-- Python 3.7
-- Django 2.2.16
-- Django Rest Framework 3.12.4
-- Simple JWT
-- SQLite3
+- [Python 3.7+](https://www.python.org/)
+- [Django 2.2.16](https://www.djangoproject.com)
+- [Django Rest Framework 3.12.4](https://www.django-rest-framework.org)
+- [Simple JWT](https://django-rest-framework-simplejwt.readthedocs.io/en/latest/)
+- [SQLite3](https://www.sqlite.org/index.html)
 
 #### Запуск проекта в dev-режиме
 
-- Склонируйте репозиторий:  
-``` git clone <название репозитория> ```    
-- Установите и активируйте виртуальное окружение:  
-``` python -m venv venv ```  
-``` source venv/Scripts/activate ``` 
-- Установите зависимости из файла requirements.txt:   
+- Склонируйте репозиторий:
+``` git clone <ссылка на репозиторий> ```
+- Установите и активируйте виртуальное окружение:
+``` py -m venv venv ```
+``` source venv/Scripts/activate ```
+- Обновите pip:
+``` py -m pip install --upgrade pip ```
+- Установите зависимости из файла requirements.txt:
 ``` pip install -r requirements.txt ```
 - Перейдите в папку api_yamdb/api_yamdb.
-- Примените миграции:   
-``` python manage.py migrate ```
+- Примените миграции:
+``` py manage.py migrate ```
 - Загрузите тестовые данные:  
-``` python manage.py load_csv_data ```
-- Выполните команду:   
-``` python manage.py runserver ```
+``` python manage.py load_data ```
+- Выполните команду:
+``` py manage.py runserver ```
+
 #### Примеры некоторых запросов API
 Регистрация пользователя:  
 ``` POST /api/v1/auth/signup/ ```  
@@ -64,7 +69,11 @@
 ``` GET /api/v1/titles/{title_id}/reviews/ ```   
 Добавление комментария к отзыву:  
 ``` POST /api/v1/titles/{title_id}/reviews/{review_id}/comments/ ```    
-#### Полный список запросов API находятся в документации
+
+#### Полный список запросов API находятся в [документации](#документация)
 
 #### Авторы
 ! Надо добавить ссылки на нас!
+[Святослав](https://github.com/owlproh)
+[Тимур](https://github.com/TimurMahmudov)
+[Мария](https://github.com/maria-kat)
