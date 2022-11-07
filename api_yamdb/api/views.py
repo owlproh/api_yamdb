@@ -10,21 +10,13 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 
-<<<<<<< HEAD
 from .filters import TitleFilter
-=======
->>>>>>> parent of ecc2873 (53 passed)
 from .permissions import (IsAdminModerAuthor, IsAdminOrAuthor,
                           IsAdminUserOrReadOnly, IsOnlyAdmin)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
-<<<<<<< HEAD
                           TitleGetSerializer, TitlePostSerializer,
                           TokenSerializer, UserMeSerializer, UsersSerializer)
-=======
-                          TitleSerializer, TokenSerializer, UserMeSerializer,
-                          UsersSerializer)
->>>>>>> parent of ecc2873 (53 passed)
 
 User = get_user_model()
 
@@ -124,7 +116,6 @@ class GenreViewSet(mixins.CreateModelMixin,
 class TitleViewSet(viewsets.ModelViewSet):
     """Viewset для объектов модели Title."""
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
-<<<<<<< HEAD
     ordering_fields = ('name', 'year')
     filterset_class = TitleFilter
     permission_classes = (IsAdminUserOrReadOnly,)
@@ -133,11 +124,6 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.action == 'list' or self.action == 'retrieve':
             return TitleGetSerializer
         return TitlePostSerializer
-=======
-    serializer_class = TitleSerializer
-    filter_backends = (DjangoFilterBackend,)
-    permission_classes = (IsAdminUserOrReadOnly,)
->>>>>>> parent of ecc2873 (53 passed)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
