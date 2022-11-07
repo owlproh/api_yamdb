@@ -12,12 +12,13 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 
-from .permissions import (IsAdminModerAuthor, IsAdminOrAuthor,
-                          IsAdminUserOrReadOnly, IsOnlyAdmin)
+from .filters import TitleFilter
+from .permissions import (IsAdminModerAuthor, IsAdminUserOrReadOnly,
+                          IsAnonimReadOnly, IsOnlyAdmin)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
-                          TitleSerializer, TokenSerializer, UserMeSerializer,
-                          UsersSerializer)
+                          TitleGETSerializer, TitleSerializer, TokenSerializer,
+                          UserMeSerializer, UsersSerializer)
 
 User = get_user_model()
 
@@ -104,6 +105,17 @@ class CategoryViewSet(mixins.CreateModelMixin,
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
+    @action(
+        methods=['DELETE'],
+        detail=False,
+        url_path=r'(?P<slug>[-a-zA-Z0-9_]+)',
+        url_name='delete_category'
+    )
+    def delete_category(self, request, slug):
+        category = get_object_or_404(Category, slug=slug)
+        category.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class GenreViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
@@ -116,13 +128,30 @@ class GenreViewSet(mixins.CreateModelMixin,
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
+    @action(
+        methods=['DELETE'],
+        detail=False,
+        url_path=r'(?P<slug>[-a-zA-Z0-9_]+)',
+        url_name='delete_genre'
+    )
+    def delete_genre(self, request, slug):
+        genre = get_object_or_404(Genre, slug=slug)
+        genre.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Viewset для объектов модели Title."""
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
-    permission_classes = (IsAdminUserOrReadOnly,)
+    filterset_class = TitleFilter
+    permission_classes = (IsAnonimReadOnly | IsAdminUserOrReadOnly,)
+
+    def get_serializer_method(self):
+        if self.request.method == 'GET':
+            return TitleGETSerializer
+        return TitleSerializer
 
 
 class CommentViewSet(viewsets.ModelViewSet):
