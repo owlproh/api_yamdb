@@ -20,15 +20,17 @@ class User(AbstractUser):
     email = models.EmailField(
         'Email',
         max_length=254,
-        unique=True
+        unique=True,
     )
     first_name = models.CharField(
         'Имя',
-        max_length=150
+        max_length=150,
+        blank=True
     )
     last_name = models.CharField(
         'Фамилия',
-        max_length=150
+        max_length=150,
+        blank=True
     )
     bio = models.TextField(
         'Биография',
@@ -36,7 +38,8 @@ class User(AbstractUser):
     )
     role = models.CharField(
         max_length=14,
-        choices=roles
+        choices=roles,
+        default=USER
     )
     confirmation_code = models.CharField(
         'Код подтверждения',
