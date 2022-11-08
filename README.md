@@ -70,6 +70,93 @@
 Добавление комментария к отзыву:  
 ``` POST /api/v1/titles/{title_id}/reviews/{review_id}/comments/ ```    
 
+#### Примеры запросов JSON-формате:
+
+Получение списка всех произведений:
+```GET api/v1/titles/```
+Ответ:
+```
+[
+ {
+   "count": 0,
+   "next": "string",
+   "previous": "string",
+   "results": [
+     {
+       "id": 0,
+       "name": "string",
+       "year": 0,
+       "rating": 0,
+       "description": "string",
+       "genre": [
+         {
+           "name": "string",
+           "slug": "string"
+         }
+       ],
+       "category": {
+         "name": "string",
+         "slug": "string"
+       }
+     }
+   ]
+ }
+]
+```
+
+Опубликовать новый отзыв:
+```POST api/v1/titles/{title_id}/reviews/```
+Запрос:
+```
+{
+"text": "string",
+"score": 1
+}
+```
+Ответ:
+```
+{
+"id": 0,
+"text": "string",
+"author": "string",
+"score": 1,
+"pub_date": "2019-08-24T14:15:22Z"
+}
+```
+Отредактировать комментарий к отзыву на произведение:
+```PATCH api/v1/titles/{title_id}/reviews/{review_id}/comments/{comment_id}/```
+Запрос:
+```
+{
+ "text": "string"
+}
+```
+Ответ:
+```
+{
+ "id": 0,
+ "text": "string",
+ "author": "string",
+ "pub_date": "2019-08-24T14:15:22Z"
+}
+```
+Добавление новой категории:
+```POST api/v1/categories/```
+Запрос:
+```
+{
+ "name": "string",
+ "slug": "string"
+}
+```
+Ответ:
+```
+{
+"name": "string",
+"slug": "string"
+}
+```
+
 #### Полный список запросов API находятся в [документации](#документация)
 
 #### Авторы
