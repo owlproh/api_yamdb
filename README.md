@@ -74,5 +74,11 @@
 
 #### Авторы
 [Святослав](https://github.com/owlproh)
+<<<<<<< HEAD
 [Тимур](https://github.com/TimurMahmudov)
+=======
+
+[Тимур](https://github.com/TimurMahmudov)
+
+>>>>>>> master
 [Мария](https://github.com/maria-kat)

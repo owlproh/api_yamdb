@@ -143,7 +143,7 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews',
         verbose_name='Произведение',
-        null=False
+        null=True
     )
     text = models.TextField(
         max_length=500,
@@ -154,8 +154,7 @@ class Review(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='reviews',
-        verbose_name='Автор отзыва',
-        null=False
+        verbose_name='Автор отзыва'
     )
     score = models.PositiveIntegerField(
         validators=[
@@ -163,8 +162,7 @@ class Review(models.Model):
             MaxValueValidator(10, 'Не больше 10')
         ],
         help_text='Поставьте произведению свою оценку',
-        verbose_name='Оценка',
-        null=False
+        verbose_name='Оценка'
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',
@@ -179,35 +177,31 @@ class Review(models.Model):
         ordering = ('-pub_date',)
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'],
+                name='unique_author_title'
+            ),
+        ]
 
 
 class Comment(models.Model):
     "Модель комментариев."
-    title = models.ForeignKey(
-        Title,
-        on_delete=models.CASCADE,
-        related_name='comments',
-        verbose_name='Произведение',
-        null=False
-    )
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name='Отзыв',
-        null=False
+        verbose_name='Отзыв'
     )
     text = models.TextField(
         max_length=200,
-        verbose_name='Комментарий',
-        null=False
+        verbose_name='Комментарий'
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='comments',
-        verbose_name='Автор комментария',
-        null=False
+        verbose_name='Автор комментария'
     )
     pub_date = models.DateTimeField(
         verbose_name='Дата публикации',

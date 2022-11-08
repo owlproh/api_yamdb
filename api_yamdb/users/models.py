@@ -8,9 +8,9 @@ USER = 'user'
 
 class User(AbstractUser):
     roles = (
-        (ADMIN, 'Администратор'),
-        (MODERATOR, 'Модератор'),
-        (USER, 'Пользователь'),
+        (ADMIN, 'admin'),
+        (MODERATOR, 'moderator'),
+        (USER, 'user'),
     )
     username = models.CharField(
         max_length=150,
@@ -19,7 +19,7 @@ class User(AbstractUser):
     email = models.EmailField(
         'Email',
         max_length=254,
-        unique=True
+        unique=True,
     )
     first_name = models.CharField(
         'Имя',

@@ -5,18 +5,19 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from rest_framework import filters, mixins, permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 
 from .filters import TitleFilter
-from .permissions import (IsAdminModerAuthor, IsAdminOrAuthor,
-                          IsAdminUserOrReadOnly, IsOnlyAdmin)
+from .permissions import (IsAdminModerAuthor, IsAdminUserOrReadOnly,
+                          IsAnonimReadOnly, IsOnlyAdmin)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
-                          TitleGetSerializer, TitlePostSerializer,
-                          TokenSerializer, UserMeSerializer, UsersSerializer)
+                          TitleGETSerializer, TitleSerializer, TokenSerializer,
+                          UserMeSerializer, UsersSerializer)
 
 User = get_user_model()
 
@@ -68,25 +69,28 @@ class UsersViewSet(viewsets.ModelViewSet):
     serializer_class = UsersSerializer
     permission_classes = (permissions.IsAuthenticated, IsOnlyAdmin,)
     filter_backends = (filters.SearchFilter,)
+    filterset_fields = ('username',)
     search_fields = ('username',)
     lookup_field = 'username'
 
-    def perform_create(self, serializer):
-        serializer = UsersSerializer(data=self.request.data)
-        serializer.is_valid()
-        serializer.save()
-        return super().perform_create(serializer)
-
-
-class UserMeView(mixins.RetrieveModelMixin,
-                 mixins.UpdateModelMixin,
-                 viewsets.GenericViewSet):
-    serializer_class = UserMeSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-    lookup_field = 'username'
-
-    def get_queryset(self):
-        return self.request.user.username
+    @action(
+        methods=['GET', 'PATCH'],
+        detail=False,
+        url_path='me',
+        permission_classes=(permissions.IsAuthenticated,)
+    )
+    def me(self, request):
+        user = get_object_or_404(User, username=self.request.user)
+        if request.method == 'GET':
+            serializer = UserMeSerializer(user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        if request.method == 'PATCH':
+            serializer = UserMeSerializer(user,
+                                          data=request.data,
+                                          partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class CategoryViewSet(mixins.CreateModelMixin,
@@ -100,6 +104,17 @@ class CategoryViewSet(mixins.CreateModelMixin,
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
+    @action(
+        methods=['DELETE'],
+        detail=False,
+        url_path=r'(?P<slug>[-a-zA-Z0-9_]+)',
+        url_name='delete_category'
+    )
+    def delete_category(self, request, slug):
+        category = get_object_or_404(Category, slug=slug)
+        category.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class GenreViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
@@ -112,18 +127,35 @@ class GenreViewSet(mixins.CreateModelMixin,
     filter_backends = (filters.SearchFilter,)
     search_fields = ('name',)
 
+    @action(
+        methods=['DELETE'],
+        detail=False,
+        url_path=r'(?P<slug>[-a-zA-Z0-9_]+)',
+        url_name='delete_genre'
+    )
+    def delete_genre(self, request, slug):
+        genre = get_object_or_404(Genre, slug=slug)
+        genre.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class TitleViewSet(viewsets.ModelViewSet):
     """Viewset для объектов модели Title."""
     queryset = Title.objects.annotate(rating=Avg('reviews__score'))
-    ordering_fields = ('name', 'year')
+    serializer_class = TitleSerializer
+    filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
-    permission_classes = (IsAdminUserOrReadOnly,)
+    permission_classes = (IsAnonimReadOnly | IsAdminUserOrReadOnly,)
+
+    def get_serializer_method(self):
+        if self.request.method == 'GET':
+            return TitleGETSerializer
+        return TitleSerializer
 
     def get_serializer_class(self):
         if self.action == 'list' or self.action == 'retrieve':
-            return TitleGetSerializer
-        return TitlePostSerializer
+            return TitleGETSerializer
+        return TitleSerializer
 
 
 class CommentViewSet(viewsets.ModelViewSet):
