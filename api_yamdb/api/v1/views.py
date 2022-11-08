@@ -1,12 +1,10 @@
-import uuid
-
-from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
+from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, permissions, status, viewsets
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
@@ -17,27 +15,23 @@ from .permissions import (IsAdminModerAuthor, IsAdminUserOrReadOnly,
                           IsAnonimReadOnly, IsOnlyAdmin)
 from .serializers import (CategorySerializer, CommentSerializer,
                           GenreSerializer, ReviewSerializer, SignUpSerializer,
-                          TitleGETSerializer, TitleSerializer, TokenSerializer,
-                          UserMeSerializer, UsersSerializer)
+                          TitleReadSerializer, TitleSerializer,
+                          UserMeSerializer, UsersSerializer,
+                          ConfirmationCodeSerializer)
+from users.models import User
 
-User = get_user_model()
 
-
-class SignUpAPIView(APIView):
-    def post(self, request):
-        serializer = SignUpSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+@api_view(['POST'])
+def sign_up(request):
+    serializer = SignUpSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
         email = serializer.validated_data['email']
         username = serializer.validated_data['username']
-        try:
-            user, create = User.objects.get_or_create(
-                email=email,
-                username=username
-            )
-        except Exception:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-        confirmation_code = str(uuid.uuid4)
+        user, create = User.objects.get_or_create(
+            email=email,
+            username=username
+        )
+        confirmation_code = default_token_generator.make_token(user)
         user.confirmation_code = confirmation_code
         user.save()
         send_mail(
@@ -48,14 +42,15 @@ class SignUpAPIView(APIView):
             fail_silently=False,
         )
         return Response(serializer.data, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TokenAPIView(APIView):
     def post(self, request):
-        serializer = TokenSerializer(data=request.data)
+        serializer = ConfirmationCodeSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        username = serializer.data['username']
-        confirmation_code = serializer.data['confirmation_code']
+        username = serializer.validated_data['username']
+        confirmation_code = serializer.validated_data['confirmation_code']
         user = get_object_or_404(User, username=username)
         if user.confirmation_code != confirmation_code:
             return Response(serializer.errors,
@@ -150,7 +145,7 @@ class TitleViewSet(viewsets.ModelViewSet):
 
     def get_serializer_method(self):
         if self.request.method == 'GET':
-            return TitleGETSerializer
+            return TitleReadSerializer
         return TitleSerializer
 
 

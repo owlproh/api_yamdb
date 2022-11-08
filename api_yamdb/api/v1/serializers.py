@@ -1,10 +1,8 @@
-from django.contrib.auth import get_user_model
-from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from reviews.models import Category, Comment, Genre, Review, Title
 
-User = get_user_model()
+from users.models import User
 
 
 class SignUpSerializer(serializers.Serializer):
@@ -20,7 +18,7 @@ class SignUpSerializer(serializers.Serializer):
         return data
 
 
-class TokenSerializer(serializers.Serializer):
+class ConfirmationCodeSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
 
@@ -71,7 +69,7 @@ class CategorySerializer(serializers.ModelSerializer):
         )
 
 
-class TitleGETSerializer(serializers.ModelSerializer):
+class TitleReadSerializer(serializers.ModelSerializer):
     """Сериализатор объектов модели Title при GET запросах."""
     genre = GenreSerializer(
         many=True,
@@ -127,7 +125,7 @@ class TitleSerializer(serializers.ModelSerializer):
         ]
 
     def to_representation(self, title):
-        serializer = TitleGETSerializer(title)
+        serializer = TitleReadSerializer(title)
         return serializer.data
 
 
@@ -165,10 +163,10 @@ class ReviewSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """Не даёт плодить комментарии."""
-        if self.context['request'].method == 'POST':
-            user = self.context['request'].user
-            title_id = self.context['view'].kwargs.get('title_id')
-            title = get_object_or_404(Title, pk=title_id)
-            if Review.objects.filter(author=user, title=title).exists():
-                raise serializers.ValidationError('Вы уже оставили отзыв.')
+        if self.context['request'].method != 'POST':
+            return data
+        user = self.context['request'].user
+        title_id = self.context['request'].parser_context['kwargs']['title_id']
+        if Review.objects.filter(author=user, title__id=title_id).exists():
+            raise serializers.ValidationError('Вы уже оставили отзыв.')
         return data

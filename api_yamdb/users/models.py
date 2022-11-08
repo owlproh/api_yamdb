@@ -37,15 +37,17 @@ class User(AbstractUser):
         blank=True
     )
     role = models.CharField(
-        max_length=14,
+        max_length=50,
         choices=roles,
         default=USER
     )
-    confirmation_code = models.CharField(
+    confirmation_code = models.TextField(
         'Код подтверждения',
-        max_length=255,
         null=True
     )
+
+    class Meta:
+        unique_together = [['email', 'username']]
 
     def __str__(self):
         return self.username

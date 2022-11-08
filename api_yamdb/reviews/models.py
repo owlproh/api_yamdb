@@ -1,12 +1,11 @@
 import textwrap as tw
 from datetime import datetime
 
-from django.contrib.auth import get_user_model
 from django.core.validators import (MaxValueValidator, MinValueValidator,
                                     RegexValidator)
 from django.db import models
 
-User = get_user_model()
+from users.models import User
 
 
 class Genre(models.Model):
@@ -170,9 +169,6 @@ class Review(models.Model):
         db_index=True
     )
 
-    def __str__(self):
-        return tw.shorten(self.text, width=15, placeholder='...')
-
     class Meta:
         ordering = ('-pub_date',)
         verbose_name = 'Отзыв'
@@ -183,6 +179,9 @@ class Review(models.Model):
                 name='unique_author_title'
             ),
         ]
+
+    def __str__(self):
+        return tw.shorten(self.text, width=15, placeholder='...')
 
 
 class Comment(models.Model):
@@ -209,10 +208,10 @@ class Comment(models.Model):
         db_index=True
     )
 
-    def __str__(self):
-        return tw.shorten(self.text, width=15, placeholder='...')
-
     class Meta:
         ordering = ('-pub_date',)
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
+
+    def __str__(self):
+        return tw.shorten(self.text, width=15, placeholder='...')
