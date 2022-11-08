@@ -14,7 +14,17 @@ class SignUpSerializer(serializers.Serializer):
 
     def validate(self, data):
         if data['username'] == 'me':
-            raise serializers.ValidationError('Недопустимый логин!')
+            raise serializers.ValidationError(
+                'Недопустимый логин!'
+            )
+        elif User.objects.filter(username=data.get('username')):
+            raise serializers.ValidationError(
+                'Такой логин занят!'
+            )
+        elif User.objects.filter(email=data.get('email')):
+            raise serializers.ValidationError(
+                'Этот emai использует другой юзер!'
+            )
         return data
 
 

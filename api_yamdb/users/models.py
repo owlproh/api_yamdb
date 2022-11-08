@@ -20,7 +20,7 @@ class User(AbstractUser):
     email = models.EmailField(
         'Email',
         max_length=254,
-        unique=True,
+        unique=True
     )
     first_name = models.CharField(
         'Имя',
@@ -45,9 +45,6 @@ class User(AbstractUser):
         'Код подтверждения',
         null=True
     )
-
-    class Meta:
-        unique_together = [['email', 'username']]
 
     def __str__(self):
         return self.username
