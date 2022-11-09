@@ -6,7 +6,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 
@@ -47,19 +46,21 @@ def sign_up(request):  # Проверь как работает, пользов�
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class TokenAPIView(APIView):
-    def post(self, request):
-        serializer = ConfirmationCodeSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        username = serializer.validated_data['username']
-        confirmation_code = serializer.validated_data['confirmation_code']
-        user = get_object_or_404(User, username=username)
-        if user.confirmation_code != confirmation_code:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
-        token = str(AccessToken.for_user(user))
-        content = {'token': token}
-        return Response(content, status=status.HTTP_201_CREATED)
+@api_view(['POST'])
+@permission_classes([permissions.AllowAny])
+def getting_token(request):
+    serializer = ConfirmationCodeSerializer(data=request.data)
+    if not serializer.is_valid(raise_exception=True):
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    username = serializer.validated_data['username']
+    confirmation_code = serializer.validated_data['confirmation_code']
+    user = get_object_or_404(User, username=username)
+    if not default_token_generator.check_token(user, confirmation_code):
+        return Response(serializer.errors,
+                        status=status.HTTP_400_BAD_REQUEST)
+    token = str(AccessToken.for_user(user))
+    content = {'token': token}
+    return Response(content, status=status.HTTP_201_CREATED)
 
 
 class UsersViewSet(viewsets.ModelViewSet):
