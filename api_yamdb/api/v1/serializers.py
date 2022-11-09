@@ -177,6 +177,6 @@ class ReviewSerializer(serializers.ModelSerializer):
             return data
         user = self.context['request'].user
         title_id = self.context['request'].parser_context['kwargs']['title_id']
-        if Review.objects.filter(author=user, title__id=title_id).exists():
+        if Review.objects.filter(author=user, title_id=title_id).exists():
             raise serializers.ValidationError('Вы уже оставили отзыв.')
         return data

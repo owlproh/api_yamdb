@@ -4,13 +4,14 @@ from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, permissions, status, viewsets
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
 
 from .filters import TitleFilter
+from .mixins import MasterViewSet
 from .permissions import (IsAdminModerAuthor, IsAdminUserOrReadOnly,
                           IsAnonimReadOnly, IsOnlyAdmin)
 from .serializers import (CategorySerializer, CommentSerializer,
@@ -22,7 +23,8 @@ from users.models import User
 
 
 @api_view(['POST'])
-def sign_up(request):
+@permission_classes([permissions.AllowAny])
+def sign_up(request):  # Нужно проверить как работает, потому-что пользователя не создать
     serializer = SignUpSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         email = serializer.validated_data['email']
@@ -89,16 +91,10 @@ class UsersViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class CategoryViewSet(mixins.CreateModelMixin,
-                      mixins.ListModelMixin,
-                      mixins.DestroyModelMixin,
-                      viewsets.GenericViewSet):
+class CategoryViewSet(MasterViewSet):
     """Viewset для объектов модели Category."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsAdminUserOrReadOnly,)
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
 
     @action(
         methods=['DELETE'],
@@ -112,16 +108,10 @@ class CategoryViewSet(mixins.CreateModelMixin,
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class GenreViewSet(mixins.CreateModelMixin,
-                   mixins.ListModelMixin,
-                   mixins.DestroyModelMixin,
-                   viewsets.GenericViewSet):
+class GenreViewSet(MasterViewSet):
     """Viewset для объектов модели Genre."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAdminUserOrReadOnly,)
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('name',)
 
     @action(
         methods=['DELETE'],
