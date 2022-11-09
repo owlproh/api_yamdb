@@ -1,5 +1,5 @@
-from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -8,22 +8,22 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 from reviews.models import Category, Genre, Review, Title
+from users.models import User
 
 from .filters import TitleFilter
 from .mixins import MasterViewSet
-from .permissions import (IsAdminModerAuthor, IsAdminUserOrReadOnly,
-                          IsAnonimReadOnly, IsOnlyAdmin)
+from .permissions import (IsAdminModerAuthor, IsAdminOrSuper,
+                          IsAdminUserOrReadOnly)
 from .serializers import (CategorySerializer, CommentSerializer,
-                          GenreSerializer, ReviewSerializer, SignUpSerializer,
+                          ConfirmationCodeSerializer, GenreSerializer,
+                          ReviewSerializer, SignUpSerializer,
                           TitleReadSerializer, TitleSerializer,
-                          UserMeSerializer, UsersSerializer,
-                          ConfirmationCodeSerializer)
-from users.models import User
+                          UserMeSerializer, UsersSerializer)
 
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
-def sign_up(request):  # Проверь как работает, пользователя не создать
+def sign_up(request):
     serializer = SignUpSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         email = serializer.validated_data['email']
@@ -66,7 +66,7 @@ def getting_token(request):
 class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UsersSerializer
-    permission_classes = (permissions.IsAuthenticated, IsOnlyAdmin,)
+    permission_classes = (permissions.IsAuthenticated, IsAdminOrSuper,)
     filter_backends = (filters.SearchFilter,)
     filterset_fields = ('username',)
     search_fields = ('username',)
@@ -132,7 +132,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilter
-    permission_classes = (IsAnonimReadOnly | IsAdminUserOrReadOnly,)
+    permission_classes = (IsAdminUserOrReadOnly,)
 
     def get_serializer_method(self):
         if self.request.method == 'GET':
