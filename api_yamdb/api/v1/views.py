@@ -3,7 +3,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, permissions, status, viewsets
+from rest_framework import filters, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -24,7 +24,7 @@ from users.models import User
 
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
-def sign_up(request):  # Нужно проверить как работает, потому-что пользователя не создать
+def sign_up(request):  # Проверь как работает, пользователя не создать
     serializer = SignUpSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         email = serializer.validated_data['email']
