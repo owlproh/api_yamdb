@@ -25,8 +25,8 @@ v1_router.register('users', UsersViewSet, basename='users')
 app_name = 'api'
 
 auth_urls = [
-    path('signup/', sign_up),
-    path('token/', TokenAPIView.as_view()),
+    path('signup/', sign_up, name='signup'),
+    path('token/', TokenAPIView.as_view(), name='token'),
 ]
 
 urlpatterns = [
